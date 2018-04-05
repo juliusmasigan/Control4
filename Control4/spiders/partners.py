@@ -19,7 +19,7 @@ class PartnersSpider(scrapy.Spider):
         countries = response.selector.xpath('//select[@id="selected-country"]/option[position()>1]/text()').extract()
 
         partners = []
-        for country in countries:
+        for country in countries[75:100]:
             url = "https://maps.googleapis.com/maps/api/geocode/json"
 
             location = json.loads(requests.get(url, params={
@@ -44,8 +44,6 @@ class PartnersSpider(scrapy.Spider):
         while(len(partners)):
             page += 1
             data['page'] = page
-            partners = json.loads(requests.post(url, data=data).content)
-
             for partner in partners:
                 partner['address_city'] = partner['address']['city']
                 partner['address_country'] = partner['address']['country']
@@ -56,5 +54,7 @@ class PartnersSpider(scrapy.Spider):
                 partner['address_state'] = partner['address']['stateProvince']
                 del partner['address']
                 partner_list.append(partner)
+
+            partners = json.loads(requests.post(url, data=data).content)
 
         return partner_list
